@@ -39,8 +39,9 @@ def standardize_names(df):
     
     a = df.columns.values #makes column names into array
     b = pd.Series(a) #makes array into panda series
-    b.replace(regex=True,inplace=True,to_replace="[\(].*?[\)]", value= "") #replaces between ()
-    
+    b.replace(regex=True,inplace=True,to_replace="[\(].*?[\)]", value= "") #removes () and in between
+    b = b.str.rstrip() #removes whitespace on right side
+    df.columns = b
     return df
 
 def fix_strings(df, col):
