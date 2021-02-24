@@ -1,3 +1,4 @@
+import pandas as pd
 """
 Checkpoint 1b
 
@@ -19,18 +20,37 @@ This should load the data, perform preprocessing, and save the output to the dat
 """
 
 def remove_percents(df, col):
+    
+    df[col].replace(regex=True,inplace=True,to_replace=r'\D',value='') #removes non number characters (including %)
+    df[col] = pd.to_numeric(df[col],errors='coerce') #converts str to number, does not replace NaN!
     return df
 
 def fill_zero_iron(df):
+    df['Iron (% DV)'] = df['Iron (% DV)'].fillna(0) #replaces NaN with 0
     return df
     
 def fix_caffeine(df):
+    df['Caffeine (mg)'] = pd.to_numeric(df['Caffeine (mg)'],errors='coerce') #converts 'varies' into NaN
+    df['Caffeine (mg)'] = df['Caffeine (mg)'].fillna(0) #replaces NaN with 0
     return df
 
 def standardize_names(df):
+    df.rename(columns=str.lower, inplace=True) #changes coloumn names to lower case
+    
+    a = df.columns.values #makes column names into array
+    b = pd.Series(a) #makes array into panda series
+    b.replace(regex=True,inplace=True,to_replace="[\(].*?[\)]", value= "") #replaces between ()
+    
     return df
 
 def fix_strings(df, col):
+    
+    df[col].replace(regex=True,inplace=True,to_replace=r'[^\w\s]',value='') #removes punctuation
+    df[col] = df[col].str.lower() #converts to lower case
+
+    
+    df[col] = df[col].str.replace('è','e') #replaces accent e with e
+    #not the best fix for accented characters, but without additional libraries like unidecode, it works fine
     return df
 
 
@@ -66,7 +86,7 @@ def main():
     
     # now that the data is all clean, save your output to the `data` folder as 'starbucks_clean.csv'
     # you will use this file in checkpoint 2
-    
+    df.to_csv ('../data/starbucks_clean.csv', index = False, header=True)
     
 
 if __name__ == "__main__":
